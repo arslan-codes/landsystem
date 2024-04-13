@@ -267,10 +267,10 @@ body {
   margin-left: 500px;
 }
 .card-container {
-  display: flex;
-  padding: 10px;
-  /* flex-wrap: wrap; */
-  /* Adjust alignment as needed */
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr; /* Adjust minmax value as needed */
+  gap: 20px; /* Adjust gap between items as needed */
+  justify-content: center; /* Center the items horizontally */
 }
 
 .card {

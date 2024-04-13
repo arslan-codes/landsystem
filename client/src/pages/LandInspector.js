@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Web3 from "web3";
-import IPFSImage from "./IPFSImage";
+// import IPFSImage from "./IPFSImage";
 import CryptoLands from "./CryptoLands.json";
 import axios from "axios";
 import { toast } from "react-toastify";
@@ -132,87 +132,84 @@ const LandInspectorPage = () => {
   };
 
   return (
-    <Layout>
+    <div>
+      <h1 className="text-center m-4 primaryText font-weight-bold">
+        LandInspector Page
+      </h1>
+      <h2 className="mx-3">Approve Property Token</h2>
+      <div className="input-group m-3 w-25">
+        <input
+          type="number"
+          className="form-control"
+          placeholder="Token ID"
+          aria-label="Token ID"
+          aria-describedby="basic-addon1"
+          value={approveTokenId}
+          onChange={(e) => setApproveTokenId(e.target.value)}
+        />
+      </div>
+      <button className="btn btn-success m-2" onClick={handleApproveProperty}>
+        Approve Property Token
+      </button>
+
+      <h2 className="mx-3">Approve Property for sale</h2>
+      <div className="input-group m-3 w-25">
+        <div className="input-group-prepend">
+          <span className="input-group-text ml-2" id="basic-addon1">
+            For Sale
+          </span>
+        </div>
+        <input
+          type="text"
+          className="form-control"
+          placeholder="Token ID"
+          aria-label="Token ID"
+          aria-describedby="basic-addon1"
+          value={SaleStatus}
+          onChange={(e) => setSaleStatus(e.target.value)}
+        />
+      </div>
+      <button className="btn btn-success m-2" onClick={ApproveProperty}>
+        Approve Property for Sale
+      </button>
+      <button className="btn btn-success m-4" onClick={fetchAllProperties}>
+        Fetch All Properties
+      </button>
+
       <div>
-        <h1 className="text-center m-4 primaryText font-weight-bold">
-          LandInspector Page
-        </h1>
-        <h2 className="mx-3">Approve Property Token</h2>
-        <div className="input-group m-3 w-25">
-          <input
-            type="number"
-            className="form-control"
-            placeholder="Token ID"
-            aria-label="Token ID"
-            aria-describedby="basic-addon1"
-            value={approveTokenId}
-            onChange={(e) => setApproveTokenId(e.target.value)}
-          />
-        </div>
-        <button className="btn btn-success m-2" onClick={handleApproveProperty}>
-          Approve Property Token
-        </button>
-
-        <h2 className="mx-3">Approve Property for sale</h2>
-        <div className="input-group m-3 w-25">
-          <div className="input-group-prepend">
-            <span className="input-group-text ml-2" id="basic-addon1">
-              For Sale
-            </span>
-          </div>
-          <input
-            type="text"
-            className="form-control"
-            placeholder="Token ID"
-            aria-label="Token ID"
-            aria-describedby="basic-addon1"
-            value={SaleStatus}
-            onChange={(e) => setSaleStatus(e.target.value)}
-          />
-        </div>
-        <button className="btn btn-success m-2" onClick={ApproveProperty}>
-          Approve Property for Sale
-        </button>
-        <button className="btn btn-success m-4" onClick={fetchAllProperties}>
-          Fetch All Properties
-        </button>
-
-        <div>
-          <h2 className="mx-3">All Properties</h2>
-          <div className="card-container">
-            {allProperties.map((property, index) => (
-              <div key={index} className="card">
-                {/* <img className="card-img-top" src="./hero_img.avif" alt="" /> */}
-                {/* <IPFSImage
+        <h2 className="mx-3">All Properties</h2>
+        <div className="card-container">
+          {allProperties.map((property, index) => (
+            <div key={index} className="card">
+              {/* <img className="card-img-top" src="./hero_img.avif" alt="" /> */}
+              {/* <IPFSImage
                   cid={"QmTa4ddADQREvZGu7TgnDeiKxChYA2pvGHLVpmYkcKKdgX"} // Use CID from property data
                 /> */}{" "}
-                <img className="card-img-top" src="./house4.jpg" alt="" />
-                <div className="card-body">
-                  <h5 className="card-title">Property {index + 1}</h5>
-                  <p className="card-text">
-                    <strong>ID:</strong> {property.tokenID.toString()}
-                  </p>
-                  <p className="card-text">
-                    <strong>Owner:</strong> {property.owner}
-                  </p>
-                  <p className="card-text">
-                    <strong>Details CID:</strong> {property.detailsCID}
-                  </p>
-                  <p className="card-text">
-                    <strong>Verified:</strong>{" "}
-                    {property.verified ? "Yes" : "No"}
-                  </p>
-                  <p className="card-text">
-                    <strong>Sale Status:</strong>{" "}
-                    {property.saleStatus ? "For Sale" : "Not for Sale"}
-                  </p>
-                </div>
+              <img className="card-img-top" src="./house4.jpg" alt="" />
+              <div className="card-body">
+                <h5 className="card-title">Property {index + 1}</h5>
+                <p className="card-text">
+                  <strong>ID:</strong> {property.tokenID.toString()}
+                </p>
+                <p className="card-text">
+                  <strong>Owner:</strong> {property.owner}
+                </p>
+                <p className="card-text">
+                  <strong>Details CID:</strong> {property.detailsCID}
+                </p>
+                <p className="card-text">
+                  <strong>Verified:</strong> {property.verified ? "Yes" : "No"}
+                </p>
+                <p className="card-text">
+                  <strong>Sale Status:</strong>{" "}
+                  {property.saleStatus ? "For Sale" : "Not for Sale"}
+                </p>
               </div>
-            ))}
-          </div>
+            </div>
+          ))}
         </div>
       </div>
-    </Layout>
+    </div>
   );
 };
 

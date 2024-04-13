@@ -6,6 +6,8 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import CryptoLands from "./CryptoLands.json";
 import Layout from "../components/layout/layout";
 
+import { toast } from "react-toastify";
+
 const BuyProperty = () => {
   const [web3, setWeb3] = useState(null); // Web3 provider instance
   const [contract, setContract] = useState(null); // Contract instance
@@ -30,6 +32,7 @@ const BuyProperty = () => {
           setWeb3(web3Instance);
           const accounts = await web3Instance.eth.getAccounts();
           setAccount(accounts[0]);
+          console.log(accounts[0]);
         } catch (error) {
           console.error("Error enabling Ethereum: ", error);
         }
@@ -79,7 +82,7 @@ const BuyProperty = () => {
         ._BuyProperty(buyTokenId)
         .send({ from: account, value: web3.utils.toWei(buyAmount, "ether") });
       console.log("Property bought:", result.transactionHash);
-      alert(`Property bought: ${result.transactionHash}`);
+      toast.success(`Property bought: ${result.transactionHash}`);
     } catch (error) {
       console.error("Failed to purchase:", error);
       alert("Failed to purchase property");
@@ -106,10 +109,22 @@ const BuyProperty = () => {
   };
 
   const fetchMetadata = useCallback(() => {
+    //https://ipfs.io/ipfs/QmZGCZH9KRCSU2SzWbwoEQgqQPrFnH4zZEFvYfRYfdUeEu?filename=property1.json
+
     fetch(`https://ipfs.io/ipfs/${cid}`)
-      .then((response) => response.json())
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+        return response.json();
+      })
       .then((metadata) => {
+        if (!metadata) {
+          console.log(metadata);
+        }
         setNFTs(metadata);
+
+        console.log(metadata);
       })
       .catch((error) => {
         console.error("Error fetching metadata:", error);
@@ -118,6 +133,7 @@ const BuyProperty = () => {
 
   useEffect(() => {
     if (cid) {
+      console.log("jel");
       fetchMetadata();
     }
   }, [cid, fetchMetadata]);

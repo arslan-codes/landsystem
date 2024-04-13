@@ -9,21 +9,20 @@ import { useNavigate } from "react-router-dom";
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
   const navigate = useNavigate();
 
-  const HandleSubmit = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       const res = await axios.post("http://localhost:8080/api/v1/auth/login", {
         password,
-
         email,
       });
       if (res.data) {
         toast.success(res.data.message);
-        // localStorage.setItem('token',res.data.token)
         localStorage.setItem("data", JSON.stringify(res.data));
+        console.log(res.data); // Log the user data received from the server
+        // Fetch additional user data here if needed
         navigate("/");
       } else {
         toast.error(res.data.message);
@@ -44,18 +43,20 @@ const Login = () => {
               <p>Please enter your credentials to login.</p>
             </div>
           </div>
-          <form className="loginInputForm" onSubmit={HandleSubmit}>
+          <form className="loginInputForm" onSubmit={handleSubmit}>
             <input
               type="text"
               placeholder="username"
+              value={email}
               onChange={(e) => setEmail(e.target.value)}
             />
             <input
               type="password"
               placeholder="password"
+              value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
-            <button>Login</button>
+            <button type="submit">Login</button>
             <p className="registrationMessage">
               Not registered? <Link to="/register">Create an account</Link>
             </p>

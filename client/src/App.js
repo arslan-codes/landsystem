@@ -1,30 +1,102 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
+import { useState, useEffect } from "react";
 import HomePage from "./pages/HomePage";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
 import Register from "./pages/auth/Register";
 import Login from "./pages/auth/Login";
-import LandInspector from "./pages/LandInspector";
+// import LandInspectorPage from "./pages/LandInspector";
+// import LandInspectorPage2 from "./pages/testfile";
 import Property from "./pages/Property";
 import MarketPlace from "./pages/Marketplace";
 import SellerPage from "./pages/sellerpage";
+import { toast } from "react-toastify";
 import BuyProperty from "./pages/BuyProperty";
+// import { AuthContext } from "./AuthContext"; // Assuming you have an AuthContext for managing authentication state
+import Web3 from "web3";
+import axios from "axios";
+import LandInspector from "./pages/landInspector copy";
+
 function App() {
+  const [account, setAccount] = useState(null);
+  const [user, setUser] = useState(null);
+  const [LandInspectorobj, setLandInspectorobj] = useState(null);
+  const [authenticUser, setAuthenticUser] = useState(null);
+  const [walletaddress, setwalletaddress] = useState(null);
+
+  useEffect(() => {
+    const LoadAccount = async () => {
+      if (window.ethereum) {
+        try {
+          await window.ethereum.request({
+            method: "eth_requestAccounts",
+          });
+          const web3Instance = new Web3(window.ethereum);
+          const accounts = await web3Instance.eth.getAccounts();
+          setAccount(accounts[0]);
+          toast.success(account[0]);
+        } catch (error) {
+          toast.error(error);
+        }
+      }
+    };
+
+    LoadAccount();
+  }, []);
+
+  useEffect(() => {
+    if (account === "0x244a901b522818899bf702223f8841510B75713f") {
+      setLandInspectorobj(account);
+    } else {
+      const userData = JSON.parse(localStorage.getItem("data"));
+      const authenticUser = async () => {
+        try {
+          const res = await axios.post(
+            "http://localhost:8080/api/v1/auth/login",
+            {
+              walletaddress,
+            }
+          );
+        } catch (Error) {
+          toast.error(Error);
+        }
+      };
+
+      if (userData) {
+        setUser(userData);
+        console.log(user);
+      }
+    }
+  }, [account]);
+  // useEffect(() => {
+  //   if (account === user.walletaddress) {
+  //     setAuthenticUser(account);
+  //   } else {
+  //     toast.error("You Wallet Address is not Registered");
+  //   }
+  // }, [account]);
+
   return (
-    <>
-      <Routes>
-        <Route path="/BuyProperty" element={<BuyProperty />}></Route>
-        <Route path="/sellerpage" element={<SellerPage />}></Route>
-        <Route path="/MarketPlace" element={<MarketPlace />}></Route>
-        <Route path="/Property" element={<Property />}></Route>
-        <Route path="/LandInspector" element={<LandInspector />}></Route>
-        <Route path="/login" element={<Login />}></Route>
-        <Route path="/register" element={<Register />}></Route>
-        <Route path="/" element={<HomePage />}></Route>
-        <Route path="/about" element={<About />}></Route>
-        <Route path="/contact" element={<Contact />}></Route>
-      </Routes>
-    </>
+    <Routes>
+      <Route path="/login" element={<Login />} />
+      <Route path="/register" element={<Register />} />
+
+      {/* Public routes */}
+      <Route path="/" element={<HomePage />} />
+      <Route path="/about" element={<About />} />
+      <Route path="/contact" element={<Contact />} />
+
+      {/* Protected routes */}
+      {LandInspectorobj && (
+        <Route path="/landInspector" element={<LandInspector />} />
+      )}
+      {user && <Route path="/sellerpage" element={<SellerPage />} />}
+      {user && <Route path="/buyProperty" element={<BuyProperty />} />}
+      <Route path="/marketplace" element={<MarketPlace />} />
+
+      {/* Redirect to login for unauthorized access */}
+      <Route path="*" element={<Navigate to="/login" />} />
+    </Routes>
   );
 }
 

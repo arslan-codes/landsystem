@@ -1,10 +1,11 @@
-import { React } from "react";
+import { React, useState } from "react";
 import { NavLink } from "react-router-dom";
 import { NavDropdown } from "react-bootstrap";
 import "../../styles/authstyle.css";
 
 const Header = () => {
   const user = JSON.parse(localStorage.getItem("data"));
+  const [account, setAccount] = useState(null);
 
   function logout() {
     localStorage.clear();
@@ -22,6 +23,7 @@ const Header = () => {
         const accounts = await window.ethereum.request({
           method: "eth_requestAccounts",
         });
+        setAccount(accounts[0]);
         console.log(accounts);
       } catch (error) {
         console.log("Error connecting...");
@@ -67,7 +69,7 @@ const Header = () => {
 
           {localStorage.getItem("data") ? (
             <button className="button" onClick={requestAccount}>
-              connect wallet
+              Connect wallet
             </button>
           ) : null}
         </div>

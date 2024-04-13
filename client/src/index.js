@@ -6,10 +6,10 @@ import "react-toastify/dist/ReactToastify.css";
 import reportWebVitals from "./reportWebVitals";
 import "./styles/authstyle.css";
 import Property from "./pages/Property";
-import Marketplce from "./pages/Marketplace";
-// import LandInspectorPage from "./pages/LandInspector";
 
 import { BrowserRouter } from "react-router-dom";
+
+import IPFSImage from "./pages/IPFSImage";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
