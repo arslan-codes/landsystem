@@ -2,6 +2,7 @@ import React from "react";
 import Layout from "../components/layout/layout";
 import "../styles/home.css";
 import CountUp from "react-countup";
+import { Link } from "react-scroll";
 import { useState, useEffect } from "react";
 const HomePage = () => {
   const [activeIndex, setActiveIndex] = useState(0);
@@ -277,6 +278,14 @@ const HomePage = () => {
           </div>
         </div>
       </section>
+      <Link
+        className="smooth-scroll-button"
+        to="hero-wrapper"
+        smooth={true}
+        duration={500}
+      >
+        Scroll to Top
+      </Link>
     </Layout>
   );
 };

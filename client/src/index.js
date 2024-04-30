@@ -1,20 +1,25 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import "./index.css";
-import App from "./App";
+import App from "./App"; // Assuming 'App.js' is in the same directory as 'index.js'
+
 import "react-toastify/dist/ReactToastify.css";
 import reportWebVitals from "./reportWebVitals";
 import "./styles/authstyle.css";
-import Property from "./pages/Property";
-
+import Ipfsfile from "./pages/Property";
+// import IPFSData from "./pages/Ipfs";
 import { BrowserRouter } from "react-router-dom";
+// import IPFSImage from "./pages/IPFSImage";
 
-import IPFSImage from "./pages/IPFSImage";
+import Marketplace from "./pages/Marketplace";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <BrowserRouter>
     <App />
+
+    {/* <Marketplace /> */}
+    {/* <PropertyForm></PropertyForm> */}
   </BrowserRouter>
 );
 

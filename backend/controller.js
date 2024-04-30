@@ -1,14 +1,13 @@
 import { executeQuery } from "./dbconnection/db.js";
 
 export const registerUser = async (req, res) => {
-  const { password, name, email, address, phone, cnic, walletaddress } =
-    req.body;
-  // password	name	email	address	phone	cnic	walletaddress
+  const { username, password, name, email, phone, address } = req.body;
+
   //sql logic
 
   const sql =
-    "INSERT INTO users (password, name, email, address, phone, cnic, walletaddress) VALUES (?,?, ?, ?, ?, ?, ?)";
-  const params = [password, name, email, address, phone, cnic, walletaddress];
+    "INSERT INTO users (username,password,name,email,phone,address) VALUES (?, ?, ?, ?, ?, ?)";
+  const params = [username, password, name, email, phone, address];
 
   try {
     const result = await executeQuery(sql, params);
@@ -29,7 +28,6 @@ export const loginUser = async (req, res) => {
   try {
     const result = await executeQuery(sql, params);
     if (result.length > 0) {
-      // res.status(200).json({message : "login successful"})
       res.status(200).json({ email: email, password: password });
     } else {
       res.status(401).json({ message: "invalid credentials" });

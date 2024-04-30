@@ -6,7 +6,7 @@ import "./assets/vendor/glightbox/css/glightbox.min.css";
 import "./assets/css/style.css";
 import profileImg from "./assets/img/profile-img.jpg";
 
-import React, { useRef, useState, useEffect } from "react";
+import React, { useRef, useState, useEffect, useCallback } from "react";
 import Web3, { ERR_INVALID_RESPONSE } from "web3";
 // import IPFSImage from "./IPFSImage";
 import CryptoLands from "./CryptoLands.json";
@@ -19,6 +19,8 @@ function LandInspector() {
   const [contract, setContract] = useState(null);
   //for all properties
   const [allProperties, setAllProperties] = useState([]);
+  const [Imagecid, Setimagecid] = useState("");
+  const [imageUrl, setImageUrl] = useState("");
 
   //for individual properties
   const [SaleStatusid, setSaleStatusid] = useState("");
@@ -28,6 +30,7 @@ function LandInspector() {
   const [propertyData, setTempProperty] = useState(null);
   const [cid, setCid] = useState(null);
   const [nfts, setNFTs] = useState(null);
+  const [nftsSingle, setNFTSinle] = useState(null);
   const [account, setAccount] = useState("");
 
   useEffect(() => {
@@ -100,7 +103,16 @@ function LandInspector() {
         const allPropertiesData = await contract.methods
           .getAllProperties()
           .call();
-        setAllProperties(allPropertiesData);
+        const propertiesWithMetadata = [];
+
+        for (const property of allPropertiesData) {
+          const metadata = await fetchMetadata(property.detailsCID);
+          const imageHash = metadata.image.replace("ipfs://", "");
+          const imageUrl = `https://ipfs.io/ipfs/${imageHash}`;
+          propertiesWithMetadata.push({ ...property, metadata, imageUrl });
+        }
+
+        setAllProperties(propertiesWithMetadata);
       } else {
         console.error("Contract not initialized");
       }
@@ -108,6 +120,41 @@ function LandInspector() {
       console.error("Error fetching all properties:", error);
     }
   };
+
+  const fetchMetadata = async (detailsCID) => {
+    try {
+      const response = await fetch(`https://ipfs.io/ipfs/${detailsCID}`);
+      const metadata = await response.json();
+      // Extracting the image hash from metadata
+      const imageHash = metadata.image.replace("ipfs://", "");
+      // Constructing the complete URL for the image
+      const imageUrl = `https://ipfs.io/ipfs/${imageHash}`;
+      return { ...metadata, imageUrl };
+    } catch (error) {
+      console.error("Error fetching metadata:", error);
+      return null;
+    }
+  };
+
+  const SinglefetchMetadata = useCallback(() => {
+    fetch(`https://ipfs.io/ipfs/${cid}`)
+      .then((response) => response.json())
+      .then((metadata) => {
+        Setimagecid(metadata.image);
+        const hashvalueimage = Imagecid.replace("ipfs://", "");
+        setImageUrl(`https://ipfs.io/ipfs/${hashvalueimage}`);
+        console.log("god the metadata");
+      })
+      .catch((error) => {
+        console.error("Error fetching metadata:", error);
+      });
+  }, [cid]);
+
+  useEffect(() => {
+    if (cid) {
+      fetchMetadata();
+    }
+  }, [cid, fetchMetadata]);
 
   const ReturnPropertyData = async (e) => {
     setApproveTokenId(e);
@@ -152,7 +199,11 @@ function LandInspector() {
         <header id="header">
           <div class="d-flex flex-column">
             <div class="profile">
-              <img src={profileImg} alt="" class="img-fluid rounded-circle" />
+              <img
+                src={profileImg}
+                alt=""
+                className="img-fluid rounded-circle"
+              />
               <h1 class="text-light">
                 <a href="index.html">Land Inspector</a>
               </h1>
@@ -175,14 +226,15 @@ function LandInspector() {
                 <li>
                   <a href="#forsale" class="nav-link scrollto">
                     <i class="bx bx-book-content"></i>
-                    <span>Aprrove Property for Sale</span>
+                    <span>Reject Property</span>
                   </a>
                 </li>
-                <li>
+                {/* <li>
                   <a href="#Reject" class="nav-link scrollto">
-                    <i class="bx bx-server"></i> <span>Reject</span>
+                    <i class="bx bx-server"></i>{" "}
+                    <span>View Recieved Request to Sale</span>
                   </a>
-                </li>
+                </li> */}
               </ul>
             </nav>
           </div>
@@ -206,13 +258,9 @@ function LandInspector() {
                   <div className="card-container">
                     {allProperties.map((property, index) => (
                       <div key={index} className="card">
-                        {/* <img className="card-img-top" src="./hero_img.avif" alt="" /> */}
-                        {/* <IPFSImage
-                  cid={"QmTa4ddADQREvZGu7TgnDeiKxChYA2pvGHLVpmYkcKKdgX"} // Use CID from property data
-                /> */}{" "}
                         <img
                           className="card-img-top"
-                          src="./house4.jpg"
+                          src={property.imageUrl}
                           alt=""
                         />
                         <div className="card-body">
@@ -234,6 +282,36 @@ function LandInspector() {
                             <strong>Sale Status:</strong>{" "}
                             {property.saleStatus ? "For Sale" : "Not for Sale"}
                           </p>
+                          {property.metadata && (
+                            <div className="col-md-6">
+                              <h5 className="card-title">Metadata</h5>
+                              <p className="card-text">
+                                <strong>Name:</strong> {property.metadata.name}
+                                <br />
+                                <strong>Description:</strong>{" "}
+                                {property.metadata.description}
+                              </p>
+                              <p className="card-text">
+                                <strong>Location:</strong>{" "}
+                                {property.metadata.location}
+                              </p>
+                              <p className="card-text">
+                                <strong>Area:</strong> {property.metadata.area}
+                              </p>
+                              <p className="card-text">
+                                <strong>Bedrooms:</strong>{" "}
+                                {property.metadata.bedrooms}
+                              </p>
+                              <p className="card-text">
+                                <strong>Bathrooms:</strong>{" "}
+                                {property.metadata.bathrooms}
+                              </p>
+                              <p className="card-text">
+                                <strong>Features:</strong>{" "}
+                                {property.metadata.features.join(", ")}
+                              </p>
+                            </div>
+                          )}
                         </div>
                       </div>
                     ))}
@@ -261,7 +339,7 @@ function LandInspector() {
                     onChange={(e) => ReturnPropertyData(e.target.value)}
                   />
                 </div>
-                <div className="card-container" style={{ width: "75%" }}>
+                <div className="card-container" style={{ width: "50%" }}>
                   {propertyData && (
                     <div className="card">
                       <div className="card-body">
@@ -295,28 +373,30 @@ function LandInspector() {
                         </div>
                         <div className="col-md-6">
                           <h5 className="card-title">Metadata</h5>
-                          {nfts && (
+                          {nftsSingle && (
                             <div>
                               <p className="card-text">
-                                <strong>Name:</strong> {nfts.name}
+                                <strong>Name:</strong> {nftsSingle.name}
                                 <br />
-                                <strong>Description:</strong> {nfts.description}
+                                <strong>Description:</strong>{" "}
+                                {nftsSingle.description}
                               </p>
                               <p className="card-text">
-                                <strong>Location:</strong> {nfts.location}
+                                <strong>Location:</strong> {nftsSingle.location}
                               </p>
                               <p className="card-text">
-                                <strong>Area:</strong> {nfts.area}
+                                <strong>Area:</strong> {nftsSingle.area}
                               </p>
                               <p className="card-text">
-                                <strong>Bedrooms:</strong> {nfts.bedrooms}
+                                <strong>Bedrooms:</strong> {nftsSingle.bedrooms}
                               </p>
                               <p className="card-text">
-                                <strong>Bathrooms:</strong> {nfts.bathrooms}
+                                <strong>Bathrooms:</strong>{" "}
+                                {nftsSingle.bathrooms}
                               </p>
                               <p className="card-text">
                                 <strong>Features:</strong>{" "}
-                                {nfts.features.join(", ")}
+                                {nftsSingle.features.join(", ")}
                               </p>
                             </div>
                           )}
@@ -341,9 +421,10 @@ function LandInspector() {
               <h2 className="mx-3">Approve Property for sale</h2>
               <div id="col3" className="section">
                 <div className="input-group m-3 w-75">
+                  <label>Enter the register Id</label>
                   <div className="input-group-prepend">
                     <span className="input-group-text ml-2" id="basic-addon1">
-                      For Sale
+                      Register Id
                     </span>
                   </div>
                   <input

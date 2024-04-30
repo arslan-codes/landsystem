@@ -6,11 +6,11 @@ Global styles body {
   background-color: #ffffff;
 }
 
-.card-container {
+/* .card-container {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 50px;
-}
+} */
 
 .card {
   width: 100%;

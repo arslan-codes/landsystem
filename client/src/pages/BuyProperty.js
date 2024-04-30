@@ -1,12 +1,10 @@
 import React, { useState, useEffect, useCallback } from "react";
 import Web3 from "web3";
-import IPFSImage from "./IPFSImage";
+
 import "../App.css"; // Import the CSS file
 import "bootstrap/dist/css/bootstrap.min.css";
 import CryptoLands from "./CryptoLands.json";
 import Layout from "../components/layout/layout";
-
-import { toast } from "react-toastify";
 
 const BuyProperty = () => {
   const [web3, setWeb3] = useState(null); // Web3 provider instance
@@ -19,6 +17,8 @@ const BuyProperty = () => {
   const [contractLoaded, setContractLoaded] = useState(false); // Contract loaded flag
   const [nfts, setNFTs] = useState(null); // Metadata
   const [cid, setCid] = useState(""); // to get the cied to view data
+  const [Imagecid, Setimagecid] = useState("");
+  const [imageUrl, setImageUrl] = useState("");
 
   // smart contract loading
   useEffect(() => {
@@ -32,7 +32,6 @@ const BuyProperty = () => {
           setWeb3(web3Instance);
           const accounts = await web3Instance.eth.getAccounts();
           setAccount(accounts[0]);
-          console.log(accounts[0]);
         } catch (error) {
           console.error("Error enabling Ethereum: ", error);
         }
@@ -82,7 +81,7 @@ const BuyProperty = () => {
         ._BuyProperty(buyTokenId)
         .send({ from: account, value: web3.utils.toWei(buyAmount, "ether") });
       console.log("Property bought:", result.transactionHash);
-      toast.success(`Property bought: ${result.transactionHash}`);
+      alert(`Property bought: ${result.transactionHash}`);
     } catch (error) {
       console.error("Failed to purchase:", error);
       alert("Failed to purchase property");
@@ -109,22 +108,14 @@ const BuyProperty = () => {
   };
 
   const fetchMetadata = useCallback(() => {
-    //https://ipfs.io/ipfs/QmZGCZH9KRCSU2SzWbwoEQgqQPrFnH4zZEFvYfRYfdUeEu?filename=property1.json
-
     fetch(`https://ipfs.io/ipfs/${cid}`)
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Network response was not ok");
-        }
-        return response.json();
-      })
+      .then((response) => response.json())
       .then((metadata) => {
-        if (!metadata) {
-          console.log(metadata);
-        }
         setNFTs(metadata);
-
-        console.log(metadata);
+        Setimagecid(metadata.image);
+        const hashvalueimage = Imagecid.replace("ipfs://", "");
+        setImageUrl(`https://ipfs.io/ipfs/${hashvalueimage}`);
+        console.log("god the metadata");
       })
       .catch((error) => {
         console.error("Error fetching metadata:", error);
@@ -133,7 +124,6 @@ const BuyProperty = () => {
 
   useEffect(() => {
     if (cid) {
-      console.log("jel");
       fetchMetadata();
     }
   }, [cid, fetchMetadata]);
@@ -164,7 +154,7 @@ const BuyProperty = () => {
           <div className="card-container" style={{ width: "75%" }}>
             {propertyData && (
               <div className="card">
-                <img className="card-img-top" src="./house4.jpg" alt="" />
+                <img className="card-img-top" src={imageUrl} alt="" />
                 <div className="card-body">
                   <div className="row">
                     <div className="col-md-6">

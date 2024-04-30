@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Send Mail</title>
+    <script type="text/javascript">
+      function sendEmail() {
+        // Replace with the recipient's email address
+        var recipientEmail = "recipient@example.com";
+
+        // Construct the mailto link with Gmail app
+        var mailtoLink =
+          "mailto:" +
+          recipientEmail +
+          "?subject=Sending Email using JavaScript&body=Well that was easy!!&amp;url=https://mail.google.com/mail/";
+
+        // Open the user's default email client (Gmail app)
+        window.location.href = mailtoLink;
+      }
+    </script>
+  </head>
+  <body>
+    <form method="post">
+      <input type="button" value="Send Email" onclick="sendEmail()" />
+    </form>
+  </body>
+</html>

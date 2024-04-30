@@ -1,11 +1,14 @@
-import { React, useState } from "react";
+import { React, useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
 import { NavDropdown } from "react-bootstrap";
 import "../../styles/authstyle.css";
+import Web3 from "web3";
+import { toast } from "react-toastify";
 
 const Header = () => {
   const user = JSON.parse(localStorage.getItem("data"));
   const [account, setAccount] = useState(null);
+  const [landInspector, setLandInspectorobj] = useState(null);
 
   function logout() {
     localStorage.clear();
@@ -15,15 +18,19 @@ const Header = () => {
   async function requestAccount() {
     console.log("Requesting account...");
 
-    // Check if Meta Mask Extension exists
     if (window.ethereum) {
       console.log("detected");
-
       try {
-        const accounts = await window.ethereum.request({
+        await window.ethereum.request({
           method: "eth_requestAccounts",
         });
+        const web3Obj = new Web3(window.ethereum);
+        const accounts = await web3Obj.eth.getAccounts();
         setAccount(accounts[0]);
+        toast.success(account.toString());
+        if (account === "0x244a901b522818899bf702223f8841510B75713f") {
+          setLandInspectorobj(account);
+        }
         console.log(accounts);
       } catch (error) {
         console.log("Error connecting...");
@@ -42,18 +49,20 @@ const Header = () => {
           <NavLink to="/" className="nav-link">
             Home
           </NavLink>
-          <NavLink to="/LandInspector" className="nav-link">
-            LandInspector
-          </NavLink>
+          {landInspector && (
+            <NavLink to="/LandInspector" className="nav-link">
+              LandInspector
+            </NavLink>
+          )}
           <NavLink to="/sellerpage" className="nav-link">
             Sell Property
           </NavLink>
           <NavLink to="/BuyProperty" className="nav-link">
             Buy Property
           </NavLink>
-          {/* <NavLink to="/Marketplace" className="nav-link">
+          <NavLink to="/Marketplace" className="nav-link">
             Marketplace
-          </NavLink> */}
+          </NavLink>
           <NavLink to="/Property" className="nav-link"></NavLink>
 
           <NavLink to="/about" className="nav-link">
@@ -62,22 +71,20 @@ const Header = () => {
           <NavLink to="/contact" className="nav-link">
             Contact Us
           </NavLink>
+          <NavLink to="/Blog" className="nav-link">
+            Blog
+          </NavLink>
 
           <NavLink to="/register" className="nav-link">
             SignUp/Login
           </NavLink>
 
-          {localStorage.getItem("data") ? (
+          {localStorage.getItem("data") && (
             <button className="button" onClick={requestAccount}>
               Connect wallet
             </button>
-          ) : null}
+          )}
         </div>
-        {localStorage.getItem("data") ? (
-          <NavDropdown title={user && user.email}>
-            <NavDropdown.Item onClick={logout}>Logout</NavDropdown.Item>
-          </NavDropdown>
-        ) : null}
       </div>
     </section>
   );

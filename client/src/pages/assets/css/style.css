@@ -122,29 +122,23 @@ a:hover {
 }
 
 #main {
-  margin-left: 280px;
+  margin-left: 220px;
 }
 
 .container,
 .container-fluid {
-  padding-left: 25px;
+  padding-left: 5px;
   padding-right: 30px;
-  width: 1199px;
+  width: 1050px;
 }
 
-@media (max-width: 1199px) {
+@media (max-width: 1050px) {
   #header {
     left: -300px;
   }
 
   #main {
     margin-left: 0;
-  }
-
-  .container,
-  .container-fluid {
-    padding-left: 12px;
-    padding-right: 12px;
   }
 }
 /* Global styles */
@@ -158,12 +152,16 @@ body {
 
 .card-container {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 50px;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 30px;
 }
 
 .card {
   width: 100%;
+}
+.card p {
+  font-size: smaller;
+  margin: 0%;
 }
 
 .card-img-top {

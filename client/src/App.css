@@ -3,6 +3,8 @@
 * {
   margin: 0;
   padding: 0%;
+
+  scroll-behavior: smooth;
 }
 
 .nft-container {
@@ -15,71 +17,16 @@
   width: 200px; /* Adjust as needed */
 }
 .card {
-  width: 18rem;
+  width: 30rem;
+  margin-left: 40px;
 }
-
-.nft-item img {
-  width: 100%;
-  height: auto;
-  border-radius: 8px; /* Rounded corners */
-  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1); /* Box shadow */
+.row {
+  margin-left: 30px;
 }
-/* Property.css */
-
-/* NFT item */
-.nft-item {
-  border: 1px solid #ccc;
-  margin-bottom: 20px;
-  padding: 10px;
-}
-
-/* Random divs in the marketplace */
-.marketplace-container {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  grid-gap: 20px;
-}
-
-.random-div {
-  background-color: #f0f0f0;
-  padding: 20px;
-  border-radius: 5px;
-  box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
-}
-.property-container {
-  font-family: Arial, sans-serif;
-  width: 80%;
-  margin: 0 auto;
-}
-
-.header {
-  background-color: #333;
-  color: white;
-  padding: 20px;
-}
-
-.main-content {
-  padding: 20px;
-}
-
-.add-cid {
-  margin-bottom: 20px;
-}
-
-.marketplace-container {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 20px;
-}
-
-.nft-item {
-  border: 1px solid #ccc;
-  padding: 10px;
-}
-
 .footer {
   background-color: #333;
   color: white;
   text-align: center;
   padding: 10px;
 }
+/* sxtra */

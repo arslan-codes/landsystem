@@ -5,12 +5,12 @@ import About from "./pages/About";
 import Contact from "./pages/Contact";
 import Register from "./pages/auth/Register";
 import Login from "./pages/auth/Login";
-// import LandInspectorPage from "./pages/LandInspector";
-// import LandInspectorPage2 from "./pages/testfile";
+import Marketplace from "./pages/Marketplace";
 import Property from "./pages/Property";
 import MarketPlace from "./pages/Marketplace";
 import SellerPage from "./pages/sellerpage";
 import { toast } from "react-toastify";
+import Blog from "./pages/blog";
 import BuyProperty from "./pages/BuyProperty";
 // import { AuthContext } from "./AuthContext"; // Assuming you have an AuthContext for managing authentication state
 import Web3 from "web3";
@@ -21,8 +21,6 @@ function App() {
   const [account, setAccount] = useState(null);
   const [user, setUser] = useState(null);
   const [LandInspectorobj, setLandInspectorobj] = useState(null);
-  const [authenticUser, setAuthenticUser] = useState(null);
-  const [walletaddress, setwalletaddress] = useState(null);
 
   useEffect(() => {
     const LoadAccount = async () => {
@@ -34,7 +32,6 @@ function App() {
           const web3Instance = new Web3(window.ethereum);
           const accounts = await web3Instance.eth.getAccounts();
           setAccount(accounts[0]);
-          toast.success(account[0]);
         } catch (error) {
           toast.error(error);
         }
@@ -49,18 +46,6 @@ function App() {
       setLandInspectorobj(account);
     } else {
       const userData = JSON.parse(localStorage.getItem("data"));
-      const authenticUser = async () => {
-        try {
-          const res = await axios.post(
-            "http://localhost:8080/api/v1/auth/login",
-            {
-              walletaddress,
-            }
-          );
-        } catch (Error) {
-          toast.error(Error);
-        }
-      };
 
       if (userData) {
         setUser(userData);
@@ -68,13 +53,6 @@ function App() {
       }
     }
   }, [account]);
-  // useEffect(() => {
-  //   if (account === user.walletaddress) {
-  //     setAuthenticUser(account);
-  //   } else {
-  //     toast.error("You Wallet Address is not Registered");
-  //   }
-  // }, [account]);
 
   return (
     <Routes>
@@ -85,6 +63,8 @@ function App() {
       <Route path="/" element={<HomePage />} />
       <Route path="/about" element={<About />} />
       <Route path="/contact" element={<Contact />} />
+      <Route path="/Blog" element={<Blog />} />
+      <Route path="/Marketplace" element={<Marketplace />} />
 
       {/* Protected routes */}
       {LandInspectorobj && (
