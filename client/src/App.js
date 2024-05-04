@@ -14,7 +14,7 @@ import Blog from "./pages/blog";
 import BuyProperty from "./pages/BuyProperty";
 // import { AuthContext } from "./AuthContext"; // Assuming you have an AuthContext for managing authentication state
 import Web3 from "web3";
-import axios from "axios";
+
 import LandInspector from "./pages/landInspector copy";
 
 function App() {
@@ -56,9 +56,6 @@ function App() {
 
   return (
     <Routes>
-      <Route path="/login" element={<Login />} />
-      <Route path="/register" element={<Register />} />
-
       {/* Public routes */}
       <Route path="/" element={<HomePage />} />
       <Route path="/about" element={<About />} />
@@ -70,12 +67,12 @@ function App() {
       {LandInspectorobj && (
         <Route path="/landInspector" element={<LandInspector />} />
       )}
-      {user && <Route path="/sellerpage" element={<SellerPage />} />}
-      {user && <Route path="/buyProperty" element={<BuyProperty />} />}
+      {<Route path="/sellerpage" element={<SellerPage />} />}
+      {/* {user && <Route path="/buyProperty" element={<BuyProperty />} />} */}
       <Route path="/marketplace" element={<MarketPlace />} />
 
       {/* Redirect to login for unauthorized access */}
-      <Route path="*" element={<Navigate to="/login" />} />
+      <Route path="*" element={<Navigate to="/" />} />
     </Routes>
   );
 }

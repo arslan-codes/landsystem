@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect } from "react";
 import Web3 from "web3";
 import CryptoLands from "./CryptoLands.json";
 import Layout from "../components/layout/layout";
@@ -11,14 +11,8 @@ const Marketplace = () => {
   const [account, setAccount] = useState("");
   const [buyAmount, setBuyAmount] = useState("");
   const [buyTokenId, setBuyTokenId] = useState("");
-  const [contractLoaded, setContractLoaded] = useState(false);
-  // metadata
-
-  const [Imagecid, Setimagecid] = useState();
-  const [propertyData, setTempProperty] = useState(null);
-  const [cid, setCid] = useState(null);
-  const [nfts, setNFTs] = useState(null);
-  const [imageUrl, setImageUrl] = useState("");
+  const [OwnerName, setOwnerName] = useState("");
+  const [OwnerCnic, setOwnerCnic] = useState("");
 
   useEffect(() => {
     const initWeb3 = async () => {
@@ -29,8 +23,6 @@ const Marketplace = () => {
           setWeb3(web3Instance);
           const accounts = await web3Instance.eth.getAccounts();
           setAccount(accounts[0]);
-          console.log(accounts[0]);
-          console.log();
         } catch (error) {
           console.error("User denied account access");
         }
@@ -41,9 +33,10 @@ const Marketplace = () => {
 
     const initContract = async () => {
       try {
-        const networkId = await web3.eth.net.getId();
+        const web3Instance = new Web3(window.ethereum);
+        const networkId = await web3Instance.eth.net.getId();
         const deployedNetwork = CryptoLands.networks[networkId];
-        const contractInstance = new web3.eth.Contract(
+        const contractInstance = new web3Instance.eth.Contract(
           CryptoLands.abi,
           deployedNetwork && deployedNetwork.address
         );
@@ -53,18 +46,18 @@ const Marketplace = () => {
       }
     };
 
-    if (web3) {
-      initContract();
-    } else {
+    if (!web3) {
       initWeb3();
+    } else if (!contract) {
+      initContract();
     }
-  }, [web3]);
+  }, [web3, contract]);
 
   const fetchAllProperties = async () => {
     try {
-      if (contract) {
+      if (contract && account) {
         const allPropertiesData = await contract.methods
-          .getAllProperties()
+          .getTokenizedProperties(account)
           .call();
         const propertiesWithMetadata = [];
 
@@ -88,9 +81,7 @@ const Marketplace = () => {
     try {
       const response = await fetch(`https://ipfs.io/ipfs/${detailsCID}`);
       const metadata = await response.json();
-      // Extracting the image hash from metadata
       const imageHash = metadata.image.replace("ipfs://", "");
-      // Constructing the complete URL for the image
       const imageUrl = `https://ipfs.io/ipfs/${imageHash}`;
       return { ...metadata, imageUrl };
     } catch (error) {
@@ -99,35 +90,15 @@ const Marketplace = () => {
     }
   };
 
-  const SinglefetchMetadata = useCallback(() => {
-    fetch(`https://ipfs.io/ipfs/${cid}`)
-      .then((response) => response.json())
-      .then((metadata) => {
-        Setimagecid(metadata.image);
-        const hashvalueimage = Imagecid.replace("ipfs://", "");
-        setImageUrl(`https://ipfs.io/ipfs/${hashvalueimage}`);
-        console.log("god the metadata");
-      })
-      .catch((error) => {
-        console.error("Error fetching metadata:", error);
-      });
-  }, [cid]);
-
-  useEffect(() => {
-    if (cid) {
-      fetchMetadata();
-    }
-  }, [cid, fetchMetadata]);
-
   const handleBuyProperty = async () => {
-    console.log("the token id is ", buyTokenId);
-
     try {
       console.log("Buying property...", buyTokenId);
-      const result = await contract.methods._BuyProperty(buyTokenId).send({
-        from: account,
-        value: web3.utils.toWei(buyAmount.toString(), "ether"),
-      });
+      const result = await contract.methods
+        ._BuyProperty(buyTokenId, OwnerName, OwnerCnic)
+        .send({
+          from: account,
+          value: web3.utils.toWei(buyAmount.toString(), "ether"),
+        });
       console.log("Property bought:", result.transactionHash);
       toast.success(`Property bought: ${result.transactionHash}`);
     } catch (error) {
@@ -143,16 +114,15 @@ const Marketplace = () => {
 
   return (
     <Layout>
-      <h1 className="text-center has-text-weight-bold">Marketplace</h1>{" "}
-      <div className="col">
+      <h1 className="text-center has-text-weight-bold">Marketplace</h1>
+      <div className="col m-5">
         <h2>Buy Property</h2>
-        <div className="input-group m-3 w-50">
+        <div className="input-group  w-50">
           <div className="input-group-prepend">
             <span className="input-group-text ml-2" id="basic-addon1">
               Token ID
             </span>
           </div>
-
           <input
             type="number"
             placeholder="Token ID"
@@ -162,7 +132,7 @@ const Marketplace = () => {
             onChange={(e) => setBuyTokenId(e.target.value)}
           />
         </div>
-        <div className="input-group m-3 w-50">
+        <div className="input-group w-50">
           <div className="input-group-prepend">
             <span className="input-group-text ml-2" id="basic-addon1">
               Buy Amount (ETH)
@@ -177,23 +147,50 @@ const Marketplace = () => {
             onChange={(e) => setBuyAmount(e.target.value)}
           />
         </div>
-
-        <button class="button w-" onClick={handleBuyProperty}>
-          <span> Buy Property</span>
+        <div className="input-group w-50">
+          <div className="input-group-prepend">
+            <span className="input-group-text ml-2" id="basic-addon1">
+              Owner Name:
+            </span>
+          </div>
+          <input
+            type="text"
+            step="any"
+            className="form-control w-50"
+            aria-describedby="basic-addon1"
+            value={OwnerName}
+            onChange={(e) => setOwnerName(e.target.value)}
+            required
+          />
+        </div>
+        <div className="input-group w-50">
+          <div className="input-group-prepend">
+            <span className="input-group-text ml-2" id="basic-addon1">
+              Owner Cnic:
+            </span>
+          </div>
+          <input
+            type="text"
+            step="any"
+            className="form-control w-50"
+            aria-describedby="basic-addon1"
+            value={OwnerCnic}
+            onChange={(e) => setOwnerCnic(e.target.value)}
+            required
+          />
+        </div>
+        <button className="button btn-success" onClick={handleBuyProperty}>
+          <span>Buy Property</span>
         </button>
-        {/* <button className="btn btn-success m-2" onClick={handleBuyProperty}>
-            Buy Property
-          </button> */}
       </div>
       <h2 className="mx-3 text-center">All Properties</h2>
       <div className="container">
-        <div>
-          <div className="card-container " style={{ width: "75%" }}>
+        <div className="">
+          <div className="row row-cols-5 g-0">
             {allProperties.map((property, index) => (
-              // <div className="card ">
               <div key={index} className="card">
                 <img className="card-img-top" src={property.imageUrl} alt="" />
-                <div className="card-body">
+                <div className="card-body pt-0 p-2">
                   <div className="row">
                     <div className="col-md-6">
                       <h5 className="card-title">Property Details</h5>

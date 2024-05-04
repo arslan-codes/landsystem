@@ -1,6 +1,6 @@
 import { React, useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
-import { NavDropdown } from "react-bootstrap";
+
 import "../../styles/authstyle.css";
 import Web3 from "web3";
 import { toast } from "react-toastify";
@@ -9,11 +9,6 @@ const Header = () => {
   const user = JSON.parse(localStorage.getItem("data"));
   const [account, setAccount] = useState(null);
   const [landInspector, setLandInspectorobj] = useState(null);
-
-  function logout() {
-    localStorage.clear();
-    window.location = "/";
-  }
 
   async function requestAccount() {
     console.log("Requesting account...");
@@ -57,9 +52,7 @@ const Header = () => {
           <NavLink to="/sellerpage" className="nav-link">
             Sell Property
           </NavLink>
-          <NavLink to="/BuyProperty" className="nav-link">
-            Buy Property
-          </NavLink>
+
           <NavLink to="/Marketplace" className="nav-link">
             Marketplace
           </NavLink>
@@ -75,15 +68,11 @@ const Header = () => {
             Blog
           </NavLink>
 
-          <NavLink to="/register" className="nav-link">
-            SignUp/Login
-          </NavLink>
-
-          {localStorage.getItem("data") && (
+          {
             <button className="button" onClick={requestAccount}>
               Connect wallet
             </button>
-          )}
+          }
         </div>
       </div>
     </section>

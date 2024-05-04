@@ -99,9 +99,9 @@ function LandInspector() {
   };
   const fetchAllProperties = async () => {
     try {
-      if (contract) {
+      if (contract && account) {
         const allPropertiesData = await contract.methods
-          .getAllProperties()
+          .getAllProperties(account)
           .call();
         const propertiesWithMetadata = [];
 
@@ -120,14 +120,11 @@ function LandInspector() {
       console.error("Error fetching all properties:", error);
     }
   };
-
   const fetchMetadata = async (detailsCID) => {
     try {
       const response = await fetch(`https://ipfs.io/ipfs/${detailsCID}`);
       const metadata = await response.json();
-      // Extracting the image hash from metadata
       const imageHash = metadata.image.replace("ipfs://", "");
-      // Constructing the complete URL for the image
       const imageUrl = `https://ipfs.io/ipfs/${imageHash}`;
       return { ...metadata, imageUrl };
     } catch (error) {
@@ -175,7 +172,7 @@ function LandInspector() {
     }
   };
 
-  const ApproveProperty = async () => {
+  const RejectProperty = async () => {
     if (!contract || !account) {
       console.error("Contract or account not loaded");
       return;
@@ -183,13 +180,14 @@ function LandInspector() {
 
     try {
       const val = await contract.methods
-        .ApproveStatus(SaleStatusid)
+        .RejectProperty(SaleStatusid)
         .send({ from: account });
-      toast.success("Property approved for sale");
-      console.log("Property approved for sale");
+      toast.success("Property Rejected ");
+      console.log("Property Rejected");
+      setAllProperties([]);
     } catch (error) {
-      console.error("Error approving property for sale:", error);
-      toast.error("Error approving property for sale:", error);
+      console.error("Error Rejecting property :", error);
+      toast.error("Error Error Rejecting property:", error);
     }
   };
 
@@ -197,44 +195,45 @@ function LandInspector() {
     <div className="App">
       <div>
         <header id="header">
-          <div class="d-flex flex-column">
-            <div class="profile">
+          <div className="d-flex flex-column">
+            <div className="profile">
               <img
                 src={profileImg}
                 alt=""
                 className="img-fluid rounded-circle"
               />
-              <h1 class="text-light">
+              <h1 className="text-light">
                 <a href="index.html">Land Inspector</a>
               </h1>
-              <div class="social-links mt-3 text-center"></div>
+              <div className="social-links mt-3 text-center"></div>
             </div>
 
-            <nav id="navbar" class="nav-menu navbar">
+            <nav id="navbar" className="nav-menu navbar">
               <ul>
                 <li>
-                  <a href="#Viewall" class="nav-link scrollto active">
-                    <i class="bx bx-home"></i> <span>View All Properties</span>
+                  <a href="#Viewall" className="nav-link scrollto active">
+                    <i className="bx bx-home"></i>{" "}
+                    <span>View All Properties</span>
                   </a>
                 </li>
                 <li>
-                  <a href="#approve" class="nav-link scrollto">
-                    <i class="bx bx-home-alt-2"></i>
+                  <a href="#approve" className="nav-link scrollto">
+                    <i className="bx bx-home-alt-2"></i>
                     <span>Aprrove Property Token</span>
                   </a>
                 </li>
                 <li>
-                  <a href="#forsale" class="nav-link scrollto">
-                    <i class="bx bx-book-content"></i>
+                  <a href="#forsale" className="nav-link scrollto">
+                    <i className="bx bx-book-content"></i>
                     <span>Reject Property</span>
                   </a>
                 </li>
-                {/* <li>
-                  <a href="#Reject" class="nav-link scrollto">
-                    <i class="bx bx-server"></i>{" "}
-                    <span>View Recieved Request to Sale</span>
+                <li>
+                  <a href="./" className="nav-link scrollto">
+                    <i className="bx bx-minus-back "></i>
+                    <span>Back To Main Site</span>
                   </a>
-                </li> */}
+                </li>
               </ul>
             </nav>
           </div>
@@ -244,8 +243,8 @@ function LandInspector() {
       {/* MAIN SECTION STARTS HERE  */}
       <main id="main">
         <section id="Viewall">
-          <div class="container">
-            <div class="section-title">
+          <div className="container">
+            <div className="section-title">
               <h2 className="mx-3">All Properties</h2>
               <div id="col1">
                 <div>
@@ -255,66 +254,81 @@ function LandInspector() {
                   >
                     Fetch All Properties
                   </button>
-                  <div className="card-container">
-                    {allProperties.map((property, index) => (
-                      <div key={index} className="card">
-                        <img
-                          className="card-img-top"
-                          src={property.imageUrl}
-                          alt=""
-                        />
-                        <div className="card-body">
-                          <h5 className="card-title">Property {index + 1}</h5>
-                          <p className="card-text">
-                            <strong>ID:</strong> {property.tokenID.toString()}
-                          </p>
-                          <p className="card-text">
-                            <strong>Owner:</strong> {property.owner}
-                          </p>
-                          <p className="card-text">
-                            <strong>Details CID:</strong> {property.detailsCID}
-                          </p>
-                          <p className="card-text">
-                            <strong>Verified:</strong>{" "}
-                            {property.verified ? "Yes" : "No"}
-                          </p>
-                          <p className="card-text">
-                            <strong>Sale Status:</strong>{" "}
-                            {property.saleStatus ? "For Sale" : "Not for Sale"}
-                          </p>
-                          {property.metadata && (
-                            <div className="col-md-6">
-                              <h5 className="card-title">Metadata</h5>
-                              <p className="card-text">
-                                <strong>Name:</strong> {property.metadata.name}
-                                <br />
-                                <strong>Description:</strong>{" "}
-                                {property.metadata.description}
-                              </p>
-                              <p className="card-text">
-                                <strong>Location:</strong>{" "}
-                                {property.metadata.location}
-                              </p>
-                              <p className="card-text">
-                                <strong>Area:</strong> {property.metadata.area}
-                              </p>
-                              <p className="card-text">
-                                <strong>Bedrooms:</strong>{" "}
-                                {property.metadata.bedrooms}
-                              </p>
-                              <p className="card-text">
-                                <strong>Bathrooms:</strong>{" "}
-                                {property.metadata.bathrooms}
-                              </p>
-                              <p className="card-text">
-                                <strong>Features:</strong>{" "}
-                                {property.metadata.features.join(", ")}
-                              </p>
+                  <div className="container ">
+                    <div className="row row-cols-4 g-0 ">
+                      {allProperties.map((property, index) => (
+                        // <div className="card ">
+                        <div key={index} className="card">
+                          <img
+                            className="card-img-top"
+                            src={property.imageUrl}
+                            alt="Image not on ipfs"
+                          />
+                          <div className="card-body p-2 pt-0">
+                            <div className="row">
+                              <div className="col-md-6">
+                                <h6 className="card-title">Property Details</h6>
+                                <p className="card-text">
+                                  <strong>ID:</strong>{" "}
+                                  {property.tokenID.toString()}
+                                </p>
+                                <p className="card-text">
+                                  <strong>Owner:</strong> {property.owner}
+                                </p>
+                                <p className="card-text">
+                                  <strong>Details CID:</strong>{" "}
+                                  {property.detailsCID}
+                                </p>
+                                <p className="card-text">
+                                  <strong>Verified:</strong>{" "}
+                                  {property.verified ? "Yes" : "No"}
+                                </p>
+                                <p className="card-text">
+                                  <strong>Sale Status:</strong>{" "}
+                                  {property.saleStatus
+                                    ? "For Sale"
+                                    : "Not for Sale"}
+                                </p>
+                              </div>
+                              <div className="col-md-6">
+                                <h6 className="card-title">Metadata</h6>
+                                {property.metadata && (
+                                  <div>
+                                    <p className="card-text">
+                                      <strong>Name:</strong>{" "}
+                                      {property.metadata.name}
+                                      <br />
+                                      <strong>Description:</strong>{" "}
+                                      {property.metadata.description}
+                                    </p>
+                                    <p className="card-text">
+                                      <strong>Location:</strong>{" "}
+                                      {property.metadata.location}
+                                    </p>
+                                    <p className="card-text">
+                                      <strong>Area:</strong>{" "}
+                                      {property.metadata.area}
+                                    </p>
+                                    <p className="card-text">
+                                      <strong>Bedrooms:</strong>{" "}
+                                      {property.metadata.bedrooms}
+                                    </p>
+                                    <p className="card-text">
+                                      <strong>Bathrooms:</strong>{" "}
+                                      {property.metadata.bathrooms}
+                                    </p>
+                                    <p className="card-text">
+                                      <strong>Features:</strong>{" "}
+                                      {property.metadata.features.join(", ")}
+                                    </p>
+                                  </div>
+                                )}
+                              </div>
                             </div>
-                          )}
+                          </div>
                         </div>
-                      </div>
-                    ))}
+                      ))}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -323,9 +337,9 @@ function LandInspector() {
         </section>
 
         {/* section approve token */}
-        <section id="approve" class="about">
-          <div class="container">
-            <div class="section-title">
+        <section id="approve" className="about">
+          <div className="container">
+            <div className="section-title">
               <h2 className="mx-3">Approve Property Token</h2>
               <div id="col2" className="section">
                 <div className="input-group m-3 w-50">
@@ -339,18 +353,22 @@ function LandInspector() {
                     onChange={(e) => ReturnPropertyData(e.target.value)}
                   />
                 </div>
-                <div className="card-container" style={{ width: "50%" }}>
+                <div className="" style={{ width: "100%" }}>
                   {propertyData && (
                     <div className="card">
                       <div className="card-body">
                         <div className="col-md-6">
                           <h5 className="card-title">Property Details</h5>
                           <p className="card-text">
-                            <strong>Nft ID:</strong>{" "}
+                            <strong>Reg ID:</strong>{" "}
                             {propertyData.tokenID.toString()}
                           </p>
                           <p className="card-text">
                             <strong>Owner:</strong> {propertyData.owner}
+                          </p>
+                          <p className="card-text">
+                            <strong>owner Name:</strong>{" "}
+                            {propertyData.ownerName}
                           </p>
                           <p className="card-text">
                             <strong>Price:</strong>{" "}
@@ -415,13 +433,13 @@ function LandInspector() {
             </div>
           </div>
         </section>
-        <section id="forsale" class="forsale">
-          <div class="container">
-            <div class="section-title">
-              <h2 className="mx-3">Approve Property for sale</h2>
+        <section id="forsale" className="forsale">
+          <div className="container">
+            <div className="section-title">
+              <h2 className="mx-3">Reject Property </h2>
               <div id="col3" className="section">
+                <h5 className="px-3"> Enter the register Id</h5>
                 <div className="input-group m-3 w-75">
-                  <label>Enter the register Id</label>
                   <div className="input-group-prepend">
                     <span className="input-group-text ml-2" id="basic-addon1">
                       Register Id
@@ -430,18 +448,15 @@ function LandInspector() {
                   <input
                     type="text"
                     className="form-control"
-                    placeholder="Token ID"
-                    aria-label="Token ID"
+                    placeholder="       Register Id"
+                    aria-label="       Register Id"
                     aria-describedby="basic-addon1"
                     value={SaleStatusid}
                     onChange={(e) => setSaleStatusid(e.target.value)}
                   />
                 </div>
-                <button
-                  className="btn btn-success m-2"
-                  onClick={ApproveProperty}
-                >
-                  Approve Property for Sale
+                <button className="btn btn-danger m-2" onClick={RejectProperty}>
+                  Reject Property
                 </button>
               </div>
             </div>
